@@ -14,12 +14,33 @@
 ## Installation
 
 ```sh
-pip example
+pip install ...
 ```
 
 
 ## How to use
 
 ```py
-import 
+import whoo
+client = whoo.Client()
+
+# login
+data=client.email_login(
+    email="example@example.com",
+    password="password"
+    )
+print(data)
+# >>> account data
+
+# create account
+data=client.create_account(
+    email="example@example.com",
+    password="password",
+    name="example",
+    username="example",
+    profile_image="https://example.com/image.png",
+    location={"latitude":35.681236,"longitude":139.767125} #option
+    )
+print(data)
+# >>> account data
 ```
