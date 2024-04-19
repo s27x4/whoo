@@ -26,9 +26,8 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (auth)')
     else:
       self.token=None
-      
-  
-  
+
+
 
   ##############  アカウントの設定関連   ##############
   def email_login(self,email,password): #アカウントにログイン(メアド)
@@ -43,8 +42,7 @@ class Client():
       self.headers["Authorization"]="Bearer "+token
       return response.json()
     else:
-      raise Exception(f'Request Error[{response.status_code}] (email login)')
-      
+      raise Exception(f'Request Error[{response.status_code}] (email login)')    
   def create_account(self,email,password,name,profile_image,username,location=None): #アカウントを作成(メアド)
     url=self.base+'api/email/users'
     data={
@@ -108,7 +106,7 @@ class Client():
 
 
   ##############  バックグラウンド処理   ##############              
-  def account_info(self): #使用中のアカウントの情報
+  def info(self): #使用中のアカウントの情報
     if self.token:
       url=self.base+'api/my'
       response=requests.get(url,headers=self.headers)
@@ -127,9 +125,8 @@ class Client():
       else:
         raise Exception(f'Request Error[{response.status_code}] (get requested)')
     else:
-      raise Exception('Message: Token is required.')
-  
-  def get_my_friends(self): #友達リストを取得
+      raise Exception('Message: Token is required.') 
+  def get_friends(self): #友達リストを取得
     if self.token:
       url=self.base+'api/friends'
       response=requests.get(url,headers=self.headers)
@@ -139,9 +136,9 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (get my friends)')
     else:
       raise Exception('Message: Token is required.')
-  def get_user(self,id,friends=False): #IDからそのアカウントの情報取得
+  def get_user(self,user_id,friends=False): #IDからそのアカウントの情報取得
     if self.token:
-      url=self.base+'api/v2/users/'+str(id)
+      url=self.base+'api/v2/users/'+str(user_id)
       response=requests.get(url,headers=self.headers)
       if response.status_code==200:
         js=response.json()
@@ -149,7 +146,7 @@ class Client():
           if js["next_page"]:
             js["friends"]=[]
             for i in range(js["next_page"]):
-              url=self.base+'api/v2/users/'+id+'/friends?page='+str(i+1)
+              url=self.base+'api/v2/users/'+user_id+'/friends?page='+str(i+1)
               response=requests.get(url,headers=self.headers)
               if response.status_code==200:
                 js["friends"]+=response.json()["friends"]
@@ -165,9 +162,9 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (get about user info)')
     else:
       raise Exception('Message: Token is required.')
-  def request_get_location(self,id): #位置情報再取得リクエストを任意のアカウントに送信します
+  def reacquire_location(self,user_id): #位置情報再取得リクエストを任意のアカウントに送信します
     if self.token:
-      url=self.base+f'api/users/{id}/location_request'
+      url=self.base+f'api/users/{user_id}/location_request'
       response=requests.get(url,headers=self.headers)
       if response.status_code==200:
         return response.json()
@@ -175,14 +172,14 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (send location request)')
     else:
       raise Exception('Message: Token is required.')
-  def post_location(self,latitude,longitude,level=100,state=0,speed=0.0,stayed_at=None,horizontal_accuracy=None): #位置情報の更新
+  def update_location(self,location,level=100,state=0,speed=0.0,stayed_at=None,horizontal_accuracy=None): #位置情報の更新
     if self.token:
       url=self.base+'api/user/location'
       data={
-        "user_location[latitude]" : str(latitude),
-        "user_location[longitude]" : str(longitude),
-        "user_location[speed]" : str(speed),
-        "user_battery[level]" : str(level),
+        "user_location[latitude]" : str(location["latitude"]),
+        "user_location[longitude]" : str(location["longitude"]),
+        "user_location[speed]" : str(speed/3.6),
+        "user_battery[level]" : str(level/100),
         "user_battery[state]": str(state)
       }
       if horizontal_accuracy:
@@ -196,15 +193,15 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (post location)')
     else:
       raise Exception('Message: Token is required.')
-  def get_locations(self,id=None):
+  def get_locations(self,user_id=None):
     if self.token:
       url=self.base+'api/locations'
       response=requests.get(url,headers=self.headers)
       if response.status_code==200:
         js={}
         for loc in response.json()['locations']:
-          if id:
-            if id==loc['user']['id']:
+          if user_id:
+            if user_id==loc['user']['id']:
               name=loc['user']['username']
               del loc['user']['username']
               loc["map"]="https://maps.google.com/maps?q="+loc['latitude']+','+loc['longitude']+"&t=k&z=24"
@@ -275,11 +272,11 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (send message)')
     else:
       raise Exception('Message: Token is required.')
-  def request_friend(self,id): #友達申請
+  def request_friend(self,user_id): #友達申請
     if self.token:
       url=self.base+f'api/friends'
       data={
-        "user_id" : id
+        "user_id" : user_id
       }
       response=requests.post(url,headers=self.headers,data=data)
       if response.status_code==200:
@@ -288,9 +285,9 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (request friend)')
     else:
       raise Exception('Message: Token is required.')
-  def delete_requested(self,id): #友達申請を取り消す
+  def delete_requested(self,user_id): #友達申請を取り消す
     if self.token:
-      url=self.base+f'api/friendships/{id}/retire'
+      url=self.base+f'api/friendships/{user_id}/retire'
       response=requests.delete(url,headers=self.headers)
       if response.status_code==200:
         return response.json()
