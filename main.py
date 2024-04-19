@@ -45,7 +45,7 @@ class Client():
     else:
       raise Exception(f'Request Error[{response.status_code}] (email login)')
       
-  def account_create(self,email,password,name,profile_image,username,location=None): #アカウントを作成(メアド)
+  def create_account(self,email,password,name,profile_image,username,location=None): #アカウントを作成(メアド)
     url=self.base+'api/email/users'
     data={
       'user[email]': email,
@@ -67,8 +67,8 @@ class Client():
           'Accept-Encoding': 'gzip, deflate, br'
           }
         data={
-          "user_location[latitude]" : '35.681236',
-          "user_location[longitude]" : '139.767125',
+          "user_location[latitude]" : str(location["latitude"]),
+          "user_location[longitude]" : str(location["longitude"]),
           "user_location[speed]" : 0,
           "user_battery[level]" : 1,
           "user_battery[state]": 1
@@ -78,7 +78,7 @@ class Client():
         return response.json()
     else:
       raise Exception(f'Request Error[{response.status_code}] (account create)')
-  def account_update(self,name=None,profile_image=None,username=None): #アカウントを更新(メアド)
+  def update_account(self,name=None,profile_image=None,username=None): #アカウントを更新(メアド)
     url=self.base+'api/user'
     data={
       'user[display_name]': name,
@@ -90,7 +90,7 @@ class Client():
       return response.json()
     else:
       raise Exception(f'Request Error[{response.status_code}] (account update)')
-  def account_delete(self,alert=True): #アカウントの削除
+  def delete_account(self,alert=True): #アカウントの削除
     if self.token:
       if alert:
         res=input('Are you sure? (y/n): ')
@@ -108,14 +108,14 @@ class Client():
 
 
   ##############  バックグラウンド処理   ##############              
-  def get_me(self): #使用中のアカウントの情報
+  def account_info(self): #使用中のアカウントの情報
     if self.token:
       url=self.base+'api/my'
       response=requests.get(url,headers=self.headers)
       if response.status_code==200:
         return response.json()
       else:
-        raise Exception(f'Request Error[{response.status_code}] (get me)')
+        raise Exception(f'Request Error[{response.status_code}] (account info)')
     else:
       raise Exception('Message: Token is required.')
   def get_requested(self): #友達申請リストを取得
@@ -261,7 +261,7 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (stamp message)')
     else:
       raise Exception('Message: Token is required.')
-  def send_message(self,room_id,text): #メッセージを送信
+  def send_message(self,room_id,text): #
     if self.token:
       url=self.base+f'api/rooms/{room_id}/messages'
       data={
