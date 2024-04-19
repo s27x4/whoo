@@ -41,9 +41,51 @@ data=client.create_account(
 print(data)
 # >>> アカウントデータ
 ```
-### 認証
+### 認証(token)
 ```py
-client=whoo.Client(token="your token")
+import whoo
+client=whoo.Client(
+    token="your token"
+    )
+```
+### 認証(email/password)
+```py
+import whoo
+client=whoo.Client(
+    email="example@example.com",
+    password="password"
+    )
+```
+
+### 基本操作
+```py
+# client=whoo.Client(...)
+
+# メッセージを送信
+client.send_message(
+    room_id="room id",
+    content="hello world"
+)
+
+# スタンプを送信
+client.send_stamp(
+    user_id="user id",
+    stamp_id="stamp id",
+    quantity=1
+)
+
+# 友達申請を送る
+client.request_friend(
+    id="user id"
+)
+
+# 友達申請を取り消す
+client.delete_requested(
+    id="user id"
+)
+```
+```py
+# client=whoo.Client(...)
 
 # アカウントデータの更新
 data=client.update_account(
@@ -55,11 +97,9 @@ print(data)
 # >>> アカウントデータ
 
 # アカウントを削除
-data=client.delete_account(
+client.delete_account(
     alert=True #確認アラートを出すかどうか(option | type: bool | default: True)
 )
-print(data)
-# >>> Success
 
 # アカウント情報
 data=client.account_info()
@@ -67,14 +107,9 @@ print(data)
 # >>> アカウント情報
 
 # ステータスをオンラインに変更
-data=client.online()
-print(data)
-# >>> request response
+client.online()
 
-# ステータスをオフラインに変更
-data=client.offline()
-print(data)
-# >>> request response
-
+# ステータスをオフラインに変更 
+client.offline()
 ```
 
