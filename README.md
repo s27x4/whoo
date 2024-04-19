@@ -4,6 +4,8 @@
 
 [whoo](https://www.wh00.ooo)のアカウントを操作します。
 
+[Web版](https://x-4.jp/tools/whoo)
+
 - アカウントの基本操作
 - 情報改竄
 
