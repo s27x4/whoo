@@ -246,13 +246,13 @@ class Client():
       
       
   ##############  基本操作   ##############        
-  def stamp_message(self,user_id,stamp_id,count): #スタンプを送信します
+  def send_stamp(self,user_id,stamp_id,quantity): #スタンプを送信します
     if self.token:
       url=self.base+f'api/stamp_messages'
       data={
         "message[user_id]" : user_id,
         "message[stamp_id]" : stamp_id,
-        "message[stamp_count]" : count
+        "message[stamp_count]" : quantity
       }
       response=requests.post(url,headers=self.headers,data=data)
       if response.status_code==204:
@@ -261,12 +261,12 @@ class Client():
         raise Exception(f'Request Error[{response.status_code}] (stamp message)')
     else:
       raise Exception('Message: Token is required.')
-  def send_message(self,room_id,text): #
+  def send_message(self,room_id,content): #
     if self.token:
       url=self.base+f'api/rooms/{room_id}/messages'
       data={
         "message[uid]" : uuid4(),
-        "message[body]" : text
+        "message[body]" : content
       }
       response=requests.post(url,headers=self.headers,data=data)
       if response.status_code==200:
